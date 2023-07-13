@@ -12,7 +12,9 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        // $schedule->command('test:cron')->everyMinute();
+        $schedule->command('user:cron')->everyFiveMinutes();
+        $schedule->command('post:cron')->everyFiveMinutes();
     }
 
     /**

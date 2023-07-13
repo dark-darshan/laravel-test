@@ -1,6 +1,9 @@
 <?php
 
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\PostController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Auth;
 
 /*
 |--------------------------------------------------------------------------
@@ -14,9 +17,22 @@ use Illuminate\Support\Facades\Route;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('auth.login');
 });
 
 Auth::routes();
 
-Route::get('/home', [App\Http\Controllers\HomeController::class, 'index'])->name('home');
+Route::group(['middleware' => 'admin'], function () {
+    Route::resource('/users',UserController::class);
+    Route::delete('delete-all', [App\Http\Controllers\Usercontroller::class,'removeMulti']);
+});
+
+Route::group(['middleware' => ['auth:web'],'namespace' => 'App\Http\Controllers'], function () { 
+    Route::get('/home', 'HomeController@index')->name('home');
+});
+
+Route::group(['middleware' => 'customer.auth'], function () {
+    Route::resource('/posts',PostController::class);
+    Route::delete('delete-all-post', [App\Http\Controllers\PostController::class,'removeMultiPost']);
+    Route::delete('/images/{image}', [App\Http\Controllers\PostController::class,'delete'])->name('images.delete');
+});
